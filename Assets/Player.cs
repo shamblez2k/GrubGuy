@@ -4,34 +4,26 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
-
+    //Ground
     public float gravity;
     public Vector2 velocity;
     public float ground = -1;
     public bool isGrounded = false;
+
+    //Vertical 
     public float jumpVelocity = 20;
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+    //Horizontal
+    public float acceleration = 2;
+    public float maxAcceleration = 20;
+    public float maxHVelocity = 100;
 
-    // Update is called once per frame
-    void Update()
-    {
-        if (isGrounded)
-        {
-            if (Input.GetKeyDown(KeyCode.UpArrow))
-            {
-                isGrounded = false;
-                velocity.y = jumpVelocity;
-            }
-        }
-    }
+    //Animator
+    public Animator animator;
 
-    private void FixedUpdate()
+    private Vector2 Jump()
     {
+        //Jump Script
         Vector2 pos = transform.position;
 
         if (!isGrounded)
@@ -44,9 +36,70 @@ public class Player : MonoBehaviour
                 pos.y = ground;
                 isGrounded = true;
             }
+
         }
 
         transform.position = pos;
+        return pos;
 
     }
+
+    private Vector2 Run()
+    {
+        //Running Script
+        if (isGrounded)
+        {
+
+            //Running acceleration script
+            float velocityRatio = velocity.x / maxHVelocity;
+            acceleration = maxAcceleration * (1.0f - velocityRatio);
+
+            velocity.x += acceleration * Time.fixedDeltaTime;
+
+            //Max speed
+            if (velocity.x >= maxHVelocity)
+            {
+                velocity.x = maxHVelocity;
+            }
+        }
+        animator.SetFloat("Speed", Mathf.Abs(velocity.x));
+        return velocity;
+    }
+
+    // Start is called before the first frame update
+    void Start()
+    {
+        
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        if (!isGrounded)
+        {
+            //Animator Script for Jump
+            animator.SetBool("isJumping", true);
+            return;
+        }
+        if (Input.GetKeyDown(KeyCode.UpArrow))
+        {
+           isGrounded = false;
+           velocity.y = jumpVelocity;
+
+            
+        }
+        if (isGrounded)
+        {
+            animator.SetBool("isJumping", false);
+        }
+
+    }
+
+    private void FixedUpdate()
+    {
+        Jump();
+        Run();
+
+    }
+
 }
