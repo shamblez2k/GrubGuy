@@ -81,12 +81,12 @@ public class Player : MonoBehaviour
             animator.SetBool("isJumping", true);
             return;
         }
-        if (Input.GetKeyDown(KeyCode.UpArrow))
+        if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W))
         {
            isGrounded = false;
            velocity.y = jumpVelocity;
 
-            
+
         }
         if (isGrounded)
         {
